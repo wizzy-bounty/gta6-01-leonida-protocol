@@ -9,6 +9,15 @@ export function createInput(canvas) {
 
   const code = (e) => e.code;
 
+  // Convert a mouse event's client position into canvas pixel coordinates.
+  const toCanvasCoords = (e) => {
+    const r = canvas.getBoundingClientRect();
+    return {
+      x: ((e.clientX - r.left) / r.width) * canvas.width,
+      y: ((e.clientY - r.top) / r.height) * canvas.height,
+    };
+  };
+
   window.addEventListener("keydown", (e) => {
     if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "Space"].includes(e.code)) e.preventDefault();
     if (!held.has(code(e))) pressedEdges.add(code(e));
@@ -18,15 +27,15 @@ export function createInput(canvas) {
   window.addEventListener("blur", () => held.clear());
 
   canvas.addEventListener("mousemove", (e) => {
-    const r = canvas.getBoundingClientRect();
-    mouse.x = ((e.clientX - r.left) / r.width) * canvas.width;
-    mouse.y = ((e.clientY - r.top) / r.height) * canvas.height;
+    const p = toCanvasCoords(e);
+    mouse.x = p.x;
+    mouse.y = p.y;
   });
   canvas.addEventListener("mousedown", (e) => {
-    const r = canvas.getBoundingClientRect();
+    const p = toCanvasCoords(e);
     mouse.clicked = true;
-    mouse.clickX = ((e.clientX - r.left) / r.width) * canvas.width;
-    mouse.clickY = ((e.clientY - r.top) / r.height) * canvas.height;
+    mouse.clickX = p.x;
+    mouse.clickY = p.y;
   });
 
   return {
